@@ -1,4 +1,7 @@
 \
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parents[1]))
 import streamlit as st, pandas as pd, joblib, json, os, time
 from pathlib import Path
 from loguru import logger
