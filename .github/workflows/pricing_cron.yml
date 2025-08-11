@@ -1,0 +1,43 @@
+name: pricing-drift-retrain
+on:
+  schedule:
+    - cron: "0 14 * * *"   # ~ midnight AEST
+  workflow_dispatch:
+jobs:
+  drift-retrain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+
+      # Prepare data if present
+      - name: Prepare UCI data (if Excel exists)
+        run: |
+          if [ -f "data/raw/Online Retail.xlsx" ]; then
+            python scripts/prepare_uci_online_retail.py --in_xlsx "data/raw/Online Retail.xlsx" --out_csv data/processed/sample_sales.csv
+          else
+            echo "UCI Excel not found; skipping prep."
+          fi
+
+      # Train (if CSV exists)
+      - name: Train demand model
+        run: |
+          if [ -f "data/processed/sample_sales.csv" ]; then
+            python scripts/train_demand.py --csv data/processed/sample_sales.csv --out artifacts/models/demand-latest.joblib
+            python scripts/make_daily_metrics.py --csv data/processed/sample_sales.csv
+            python scripts/build_eval_windows.py --csv data/processed/sample_sales.csv
+            python scripts/check_drift_pricing.py
+          else
+            echo "Processed CSV not found; skipping training."
+          fi
+
+      - name: Commit artifacts (if changed)
+        run: |
+          git config user.name "automation"
+          git config user.email "automation@users.noreply.github.com"
+          git add artifacts || true
+          git commit -m "Nightly: update model/metrics/drift" || echo "No changes"
+          git push || true

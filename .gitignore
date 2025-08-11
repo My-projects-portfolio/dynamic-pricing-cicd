@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+env/
+
+# OS files
+.DS_Store
+
+# Logs & local artifacts
+logs/
+artifacts/*
+!artifacts/.gitkeep
+
+# Data
+data/processed/*
+data/raw/*
+!data/.gitkeep
+
+# Streamlit
+.streamlit/secrets.toml
