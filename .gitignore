@@ -10,15 +10,16 @@ env/
 # OS files
 .DS_Store
 
-# Logs & local artifacts
+# Logs (keep out of repo)
 logs/
-artifacts/*
-!artifacts/.gitkeep
 
 # Data
-data/processed/*
+# Track processed data; ignore only raw source dumps.
 data/raw/*
 !data/.gitkeep
+
+# Artifacts
+# Track model/metrics/drift artifacts — do NOT ignore this folder.
 
 # Streamlit
 .streamlit/secrets.toml
